@@ -16,12 +16,21 @@ entries:
       show_more_text: See archive...
       show_more_url: archive.html
 
-  - title: posts by category
+  - title: example2
     post_list:
       category: example2
+      limit: 1
       show_more: true
       show_more_text: See more posts...
       show_more_url: example2-archive.html
+  
+  - title: example1
+    post_list:
+        category: example
+        limit: 1
+        show_more: true
+        show_more_text: See more posts...
+        show_more_url: example1-archive.html
 
   - title: rss
     url: feed.xml
