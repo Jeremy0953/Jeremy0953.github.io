@@ -2,46 +2,44 @@
 # https://github.com/riggraz/no-style-please#customize-the-menu
 
 entries:
-  - title: info
+  - title: about
     entries:
-      - title: a (nearly) no-CSS, fast, minimalist Jekyll theme.
-      - title: github repo
-        url: https://github.com/riggraz/no-style-please
-      - title: "used by <a href='https://riggraz.dev'>riggraz.dev</a> and <a href='https://github.com/riggraz/no-style-please/network/dependents'>many others</a>"
+      - title: Hi！我是杨佳东
+      - title: 是来自HIT计科的一名普通学生
+      - title: 持续认识到自己的不足并在不断填坑中
+      - title: 希望找到自己内心的spark的同时不要成为寻找大海的鱼
+      - title: 这是我的博客
+      - title: 也是互联网上属于我的一点点小小的空间
+      - title: 可能会随缘更新一些学习相关的文章或者自己生活中的碎碎念
 
   - title: all posts
     post_list:
-      limit: 5
+      limit: 3
       show_more: true
       show_more_text: See archive...
       show_more_url: archive.html
 
-  - title: example2
+  - title: Designing Data-Intensive Application
     post_list:
-      category: example2
-      limit: 1
+      category: DDIA
+      limit: 3
       show_more: true
       show_more_text: See more posts...
-      show_more_url: example2-archive.html
-  
-  - title: example1
-    post_list:
-        category: example
-        limit: 1
-        show_more: true
-        show_more_text: See more posts...
-        show_more_url: example1-archive.html
+      show_more_url: DDIA-archive.html
 
-  - title: rss
-    url: feed.xml
-  
-  - title: another list
+  - title: 一些碎碎念
+    post_list:
+      category: view
+      limit: 3
+      show_more: true
+      show_more_text: 再看看之前的...
+      show_more_url: view-archive.html
+
+  - title: github repo
+    url: https://github.com/Jeremy0953/Jeremy0953.github.io
+ 
+  - title: 最后
     entries:
-      - title: with subitems
-        entries:
-          - title: with subsubitems
-          - title: example page
-            url: about
-  - title: PRO TIP
-    entries:
-      - title: to edit this menu, edit _data/menu.yml file
+      - title: 谢谢你愿意在信息爆炸的今天抽出时间到这里看看
+      - title: 如果愿意交流讨论可以私戳
+      - title: 我会很开心的
