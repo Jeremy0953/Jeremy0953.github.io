@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>可靠性 可扩展性 可维护性</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="可靠性 可扩展性 可维护性" />
+<meta name="author" content="Jeremy Yang" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="TOC" />
+<meta property="og:description" content="TOC" />
+<link rel="canonical" href="http://localhost:4000/%E5%8F%AF%E9%9D%A0%E6%80%A7-%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7-%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7.html" />
+<meta property="og:url" content="http://localhost:4000/%E5%8F%AF%E9%9D%A0%E6%80%A7-%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7-%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7.html" />
+<meta property="og:site_name" content="This is Jeremy!" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-08T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="可靠性 可扩展性 可维护性" />
+<script type="application/ld+json">
+{"headline":"可靠性 可扩展性 可维护性","dateModified":"2021-10-08T00:00:00+08:00","datePublished":"2021-10-08T00:00:00+08:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/%E5%8F%AF%E9%9D%A0%E6%80%A7-%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7-%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7.html"},"url":"http://localhost:4000/%E5%8F%AF%E9%9D%A0%E6%80%A7-%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7-%E5%8F%AF%E7%BB%B4%E6%8A%A4%E6%80%A7.html","author":{"@type":"Person","name":"Jeremy Yang"},"description":"TOC","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="This is Jeremy!" /><link rel="shortcut icon" type="image/x-icon" href="/logo.png" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="auto">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">..</a><article>
+  <p class="post-meta">
+    <time datetime="2021-10-08 00:00:00 +0800">2021-10-08</time>
+  </p>
+  
+  <h1>可靠性 可扩展性 可维护性</h1>
+
+  <h2 id="toc">TOC</h2>
+
+<p>现在很多应用都是数据密集型应用(data-intensive)，而不是计算密集型应用(compute-intensive)</p>
+
+<p>数据密集型应用的标准组件及其通用功能：</p>
+<ul>
+  <li>存储数据（database）</li>
+  <li>加快读取速度(cache)</li>
+  <li>按关键词搜索数据，或对数据进行过滤(search indexes)</li>
+  <li>向其他进程发送消息，进行异步处理(stream processing)</li>
+  <li>定期处理大批量数据(batch processing)</li>
+</ul>
+
+<p>基础目标：</p>
+<ul>
+  <li>可靠性(Reliability)</li>
+  <li>可扩展性(Scalability)</li>
+  <li>可维护性(Maintainability)</li>
+</ul>
+
+<h2 id="可靠性">可靠性</h2>
+
+<p><strong>系统在困境中仍可以正常工作</strong></p>
+
+<p>故障(fault)：造成错误的原因,通常定义为系统的一部分状态偏离其标准</p>
+
+<p>容错(fault-tolerant)：能<strong>预料</strong>并应对故障的系统特性</p>
+
+<p>失效(failure): 系统作为一个整体停止向用户提供服务。</p>
+
+<p>硬件故障的解决方式：增加单个硬件的冗余度、软件容错机制</p>
+
+<p>软件错误：内部的系统性错误(systematic error)，比如失控进程占用共享资源等，还有比如级联故障等。解决方法：仔细考虑假设和交互，测试，进程隔离，测量监控等等……</p>
+
+<p>人为错误：运维配置错误是导致服务中断的首要原因。解决方法：以最小化犯错机会的方式设计系统（比如抽象、设计api等等），将人们最容易犯错的地方和可能导致失效的地方解耦(decouple)，提供一个功能齐全的非生产环境沙箱(sandbox)，在各个层次进行彻底的测试，允许从人为错误中简单快速地恢复，配置详细和明确的监控，良好的管理实践与充分的培训。</p>
+
+<h2 id="可扩展性">可扩展性</h2>
+
+<p>“如果系统以特定方式增长，有什么选项可以应对增长？”</p>
+
+<p>“如何增加计算资源来处理额外的负载？”</p>
+
+<h3 id="描述负载">描述负载</h3>
+
+<p>负载参数的最佳选择取决于系统架构，可能是每秒向web服务器发出的请求、数据库中的读写比率、聊天室中同时活跃的用户数量、缓存命中率或其他东西</p>
+
+<h4 id="推特的例子">推特的例子</h4>
+
+<p>推特发布推文：用户可以向其粉丝发布新消息（平均 4.6k请求/秒，峰值超过 12k请求/秒）。</p>
+
+<p>主页时间线：用户可以查阅他们关注的人发布的推文（300k请求/秒）。</p>
+
+<p>处理每秒12,000次写入（发推文的速率峰值）还是很简单的。然而推特的扩展性挑战并不是主要来自推特量，而是来自扇出（fan-out）——每个用户关注了很多人，也被很多人关注。</p>
+
+<p>有两种实现方式。</p>
+
+<h5 id="方式1">方式1</h5>
+
+<p>发布推文时，只需要将新推文推入全局推文集合即可，当请求自己的主页时间线时，首先查找他关注的所有人，查询这些被关注用户发布的推文并按时间顺序合并。</p>
+
+<p><img src="/home/jeremy/blog/Jeremy0953.github.io/pictures/2021-10-08 12-10-42 的屏幕截图.png" alt="" /></p>
+
+
+</article>
+      </div>
+    </main>
+  </body>
+</html>
