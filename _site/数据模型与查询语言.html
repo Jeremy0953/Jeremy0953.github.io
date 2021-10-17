@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>数据模型与查询语言</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="数据模型与查询语言" />
+<meta name="author" content="Jeremy Yang" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="TOC" />
+<meta property="og:description" content="TOC" />
+<link rel="canonical" href="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html" />
+<meta property="og:url" content="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html" />
+<meta property="og:site_name" content="This is Jeremy!" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-17T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="数据模型与查询语言" />
+<script type="application/ld+json">
+{"headline":"数据模型与查询语言","dateModified":"2021-10-17T00:00:00+08:00","datePublished":"2021-10-17T00:00:00+08:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html"},"url":"http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html","author":{"@type":"Person","name":"Jeremy Yang"},"description":"TOC","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="This is Jeremy!" /><link rel="shortcut icon" type="image/x-icon" href="/logo.png" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="auto">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">..</a><article>
+  <p class="post-meta">
+    <time datetime="2021-10-17 00:00:00 +0800">2021-10-17</time>
+  </p>
+  
+  <h1>数据模型与查询语言</h1>
+
+  <h2 id="toc">TOC</h2>
+
+<p>对于每层数据模型的关键问题是：<strong>它是如何用低一层数据模型来表示的？</strong></p>
+
+<p>一个复杂的应用程序可能会有更多的中间层次，比如基于API的API，不过基本思想仍然是一样的：每个层都通过提供一个明确的数据模型来隐藏更低层次中的复杂性。</p>
+
+<h2 id="关系模型与文档模型">关系模型与文档模型</h2>
+
+<p>现在最著名的数据模型可能是SQL，他基于Edgar Codd在1970年提出的关系模型：数据被组织成关系（SQL中称作表），其中每个关系是元组（SQL中称作行）的无序集合。</p>
+
+<h3 id="nosql的诞生">NoSQL的诞生</h3>
+
+<p>NoSQL被解释为（Not Only SQL），NoSQL数据库背后的驱动因素</p>
+
+<ul>
+  <li>需要比关系型数据库更良好的扩展性，包括更大的数据集和非常高的写入吞吐量</li>
+  <li>免费开源</li>
+  <li>关系模型不能很好地支持一些特殊的查询操作</li>
+  <li>受限于关系模型的限制性，渴望一种更具多动态性于表现力的数据模型</li>
+</ul>
+
+<p><strong>不同的应用程序有不同的需求，一个用例的最佳技术选择可能不同于另一个用例的最佳技术选择，因此在可见的未来，关系数据库似乎可能与各种非关系数据库一起使用，这种想法有时被称为<em>混合持久化</em></strong></p>
+
+<h3 id="对象关系不匹配">对象关系不匹配</h3>
+
+<p>目前大多数应用开发程序都使用面向对象的语言来开发，如果数据存储在关系表中，则需要一个笨拙的转换层。模型之间的不连贯有时被称为<em>阻抗不匹配</em>。</p>
+
+<p>像ActiveRecord和Hibernate这样的<em>对象关系映射（object-relational mapping, ORM）</em>框架可以减少这个转换层所需的样板代码的数量，但是它们不能完全隐藏这两个模型之间的差异。</p>
+
+<p>例如一个领英上面的简历的例子：</p>
+
+<p>如果用关系型数据模型去表征的话：</p>
+
+<p><img src="https://raw.githubusercontent.com/Jeremy0953/Jeremy0953.github.io/main/pics/2021-10-17-pic1.png" alt="" /></p>
+
+<p>用JSON文档去表示：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+"user_id": 251,
+"first_name": "Bill",
+"last_name": "Gates",
+"summary": "Co-chair of the Bill &amp; Melinda Gates... Active blogger.",
+"region_id": "us:91",
+"industry_id": 131,
+"photo_url": "/p/7/000/253/05b/308dd6e.jpg",
+"positions": [
+{
+"job_title": "Co-chair",
+"organization": "Bill &amp; Melinda Gates Foundation"
+},
+{
+"job_title": "Co-founder, Chairman",
+"organization": "Microsoft"
+}
+],
+"education": [
+{
+"school_name": "Harvard University",
+"start": 1973,
+"end": 1975
+},
+{
+"school_name": "Lakeside School, Seattle",
+"start": null,
+"end": null
+}
+],
+"contact_info": {
+"blog": "http://thegatesnotes.com",
+"twitter": "http://twitter.com/BillGates"
+}
+}
+</code></pre></div></div>
+
+<p>JSON表示比关系模型中的多表模式具有更好的局部性，如果在关系型数据库中获取简介信息则需要多表连接，在JSON表示中，所有相关的信息都在一个地方，一个查询就足够了。</p>
+
+<h3 id="多对一和多对多的关系">多对一和多对多的关系</h3>
+
+<p>解释一下为什么数据库中存的都是ID而不是纯字符串的名字</p>
+
+<p>如果用户用一个自由文本字段输入区域和行业，那么将他们存储为纯文本字符串是合理的。另一种方式是给出一个区域和行业的列表，让用户从下拉列表中进行选择。</p>
+
+<ul>
+  <li>各个简介之间样式和拼写统一</li>
+  <li>避免歧义</li>
+  <li>易于更新——名称只存在一个地方，如需要修改则很容易进行全面更新。</li>
+  <li>本地化支持——当网站翻译成其他语言时，标准化的列表可以本地化</li>
+  <li>更好的搜索——比如搜索某某地的简历就可以匹配到这个简历（某某地的地名不一定显示出现）</li>
+</ul>
+
+<p>存储ID还是文本字符串，这是个副本（duplication）问题，当使用ID时，对人类有意义的信息（比如地名）只存储在一处，所有引用它的地方使用ID，当直接存储文本时，对人类有意义的信息就会复制在没处使用记录中。</p>
+
+<p>使用ID的好处是，ID对人们没有意义，所以也就永远不需要改变。任何对人类有意义的信息都有可能在未来的某个时刻被改变，如果这个信息被复制了多份，所有的副本都需要被更新，这会导致写入开销，也存在不一致的风险（一些副本更新了，一些还没更新）。去除此类重复是数据库规范化（normalization）的关键思想。</p>
+
+<p>文档模型对于连接的支持很弱。</p>
+
+<p>一对多的关系：比如简历中一个人的工作经历可能有，公司1，公司2，公司3，这样子是一对多的关系，对于这样的关系模式，文档模型可以很好地去描述。</p>
+
+<p>多对多的关系：比如简历中的工作经历中的公司1不仅是一个公司的名字而是一个指向公司实体的链接，同理其他的也是，那么这个就是一个多对多的关系，文档模型对于处理这样的多对多的关系比较乏力。</p>
+
+<p>比如在引用其他公司的时候需要利用到连接操作，但是文档对于连接的支持很弱，或者有些就直接不支持连接，只能在应用程序代码中执行多个查询来模拟连接。</p>
+
+<h3 id="文档数据库是否是重蹈覆辙">文档数据库是否是重蹈覆辙？</h3>
+
+<p>数据库最开始是一种很简单的数据模型，称为层次模型（hierarchical model），他将所有数据表示为嵌套在记录中的记录树，也是良好地处理一对多的关系但是很难应对多对多的关系，且不支持连接。</p>
+
+<p>后来人们提出了一些解决方案来解决层次模型的局限性，最突出的两个一个是关系模型，一个是网络模型。</p>
+
+<h3 id="网络模型">网络模型</h3>
+
+<p><strong><em>CODASYL模型</em></strong></p>
+
+<p>在层次模型的树结构中，每条记录只有一个父节点，在网络模型中，每个记录可能有多个父节点，网络模型中记录之间的链接不是外键，而更像是编程语言中的指针。访问记录的唯一方法是跟随从根记录起沿这些链路所形成的路径。这被称为访问路径。</p>
+
+<p>最简单的访问类似与遍历链表一样的访问。但在多对多关系的情况下，可能有不同的路径到达相同的记录，网络模型的程序员必须跟踪这些不同的访问路径。</p>
+
+<p>网络模型的查询是利用遍历记录列和跟随路径表在数据库中的移动游标来执行的。如果记录有多个父结点，则应用程序代码必须跟踪所有的关系。</p>
+
+<p>尽管手动选择访问路径能够最有效地利用非常有限的硬件功能，但这使得查询和更新数据库的代码变得复杂不灵活。如果没有路径就会陷入困境，你可以改变访问路径但是要浏览手写大量数据库查询代码。</p>
+
+<h3 id="关系模型">关系模型</h3>
+
+<p>关系模型是将所有模型放在光天化日之下，一个关系是元组的集合，仅此而已。如果你想读取数据，没有迷宫似的嵌套结构，也没有复杂的访问路径。你可以选中任何符合条件的行，读取特定行或者所有行，或者可以插入新的行。</p>
+
+<p>关系数据库中，查询优化器会自动决定查询的哪个部分以哪个顺序执行，是自动生成的，不需要由程序员生成。</p>
+
+<p>如果想要用新的方式查询，可以添加新的索引。</p>
+
+<h3 id="关系数据库与文档数据库的对比">关系数据库与文档数据库的对比</h3>
+
+<p>多对一的关系（比如许多人生活在一个特性的地区，许多人在一个特定的行业工作）</p>
+
+<p>在表示多对一和多对多的关系时，关系数据库和文档数据库并没有根本的不同。在这两种情况下，相关项目都被一个唯一的标识符引用，这个标识符在关系模型中被称为外键，在文档模型中被称为文档引用。</p>
+
+<p>文档数据模型，主要是架构灵活性，因为局部性而拥有更好的性能，对于某些应用程序而言更接近与应用程序所使用的数据结构。关系模型则是为连接提供更好的支以及支持多对一和多对多的关系。</p>
+
+<h3 id="哪种更方便写代码">哪种更方便写代码？</h3>
+
+<p>如果应用程序中有类似文档的结构，比如一对多关系树，通常一次性加载整个树，那么使用文档模型是一个好主意。</p>
+
+<p>文档模型有局限性，比如不能直接引用文档中嵌套的项目，而是说“用户251的位置列表中的第二项”。</p>
+
+<p>如果应用程序不需要多对多关系就没什么问题，但是如果需要多对多的话就不太好了。可以通过规范化减少对连接的需求，也可以在应用程序中模拟连接，等等，但是在这种情况下文档模型会导致更复杂的应用程序代码和更差的性能。</p>
+
+<p><strong>很难说一般情况哪种数据模型让应用程序代码更简单，取决于数据项时间的关系种类。对于高度相联的数据使用文档模型是糟糕的，但是选用关系模型是可接受的，使用图数据模型是最自然的。</strong></p>
+
+<h3 id="文档模型的架构灵活性">文档模型的架构灵活性</h3>
+
+<p>大多数文档数据库都不会强制文档中的数据采用何种模式。没有模式意味可以将任意的key和value添加到文档中，当读取的时候，客户端无法保证文档可能包含的字段。</p>
+
+<p>文档数据库采取读时模式。</p>
+
+<p>读时模式（schema-on-read）数据的结构是隐含的，只有在数据被读取的时候才被解释。</p>
+
+<p>写时模式（schema-on-write）传统的关系数据库方法中，模式明确，且数据库确保所有的数据符合其模式。</p>
+
+<p>当应用程序想要改变数据格式时这两种区别比较大。文档数据库中，只需要开始写入具有新字段的新文档，并在程序中使用代码处理旧文档，例如：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if (user &amp;&amp; user.name &amp;&amp; !user.first_name) {
+// Documents written before Dec 8, 2013 don't have first_name
+user.first_name = user.name.split(" ")[0];
+}
+</code></pre></div></div>
+
+<p>在写时模式中</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ALTER TABLE users ADD COLUMN first_name text;UPDATE users SET first_name = split_part(name, ' ', 1); -- PostgreSQLUPDATE users SET first_name = substring_index(name, ' ', 1); -- MySQL
+</code></pre></div></div>
+
+<p>模式变更的速度很慢并且需要停运。尽管绝大数关系数据库可以在几毫秒内执行ALTER TABLE 语句，但是MySQL是一个例外，他执行ALTER TABLE时会复制整个表，所以更改一个大型表可能会花几分钟甚至几个小时的停机。</p>
+
+<p>大型表运行UPDATE都会很慢，因为每一行都要改写。</p>
+
+<p>由于某种原因，集合中的项目并不具有相同的结构时，读时模式更具有优势。比如：</p>
+
+<ul>
+  <li>在许多不同类型的对象，将每种类型的对象放在自己的表中是不现实的。</li>
+  <li>数据的结构由外部系统决定，你无法控制外部系统且它随时可能变化。</li>
+</ul>
+
+<p>在上述情况下，模式的坏处大于好处，无模式文档是一个更加自然的数据模型。要是所有的记录都有相同的结构，那么模式是强制这种结构的有效机制。</p>
+
+<h3 id="查询的数据局部性">查询的数据局部性</h3>
+
+<p>文档通常以单个连续字符串形式进行存储。如果应用程序经常需要访问整个文档（例如渲染整个网页），那么存储局部性将带来性能优势，如果数据分割到各个表中则需要进行多个索引查找才能全部检索出来，这需要花费更多的时间。</p>
+
+<p><strong>局部性仅仅适用于同时需要文档绝大部分内容的情况。</strong>数据库通常需要加载整个文档，如果只是访问很大的文档中的一小部分，这个是很浪费的。而且更新文档的时候需要整个重写，只有不改变文档大小的修改才可以容易地原地执行。所以通常建议保持相对小的文档并且避免增加文档大小的写入。这些性能限制大大减少了文档数据库的实用场景。</p>
+
+<h3 id="文档和关系数据库的融合">文档和关系数据库的融合</h3>
+
+<p>如果一个数据库能够处理类似文档的数据，并且能够对其执行关系查询，那么应用程序就可以使用最符合其需求的功能组合。</p>
+
+<p>关系模型和文档模型的混合是未来数据库的一条很好的路线。</p>
+
+<h2 id="数据查询语言">数据查询语言</h2>
+
+<p><strong>命令式语言</strong>告诉计算机以特定顺序执行某些操作，比如java语言，循环遍历之类的。</p>
+
+<p><strong>声明式语言</strong>如SQL或关系代数，你只需指定所需数据的模式，结果必须符合哪些条件，以及如何将数据转换。但是对于如何实现这个目标并没有要求，数据库的查询优化器去决定使用哪些索引哪些连接方法，以及什么顺序去执行。</p>
+
+<p>SQL示例不确保任何特定的顺序，因此不在意顺序是否改变。声明式语言往往适合并行执行。（命令代码由于指定了顺序，所以很难在多个机器和多个内核之间并行化，但是声明语言具有并行执行的潜力）</p>
+
+<h3 id="web上的声明式查询">Web上的声明式查询</h3>
+
+<p>利用CSS选择器要比Javascript的实现方式简洁多了。</p>
+
+<h3 id="mapreduce查询">MapReduce查询</h3>
+
+<p>MapReduce既不是一个声明式查询也不是一个完全命令式的查询，而是介于两者之间，查询的逻辑用代码片段表示，这些代码片段会被框架重复性调用。它基于map函数和reduce函数，两个函数存在于许多函数式编程语言中。</p>
+
+<p>map和reduce函数在功能上有所限制，他们必须是纯函数，他们只使用传递给他们的数据作为输入，不能执行额外的数据库查询也不能有任何副作用。这些限制允许数据库以任何顺序执行任何功能并在失败时重新运行他们。然而map和reduce函数仍然是强大的，他们可以解析字符串调用库函数执行计算等等。</p>
+
+<p>MapReduce是一个相当底层的编程模型，用于计算机集群上的分布式执行。</p>
+
+<h2 id="图数据模型">图数据模型</h2>
+
+<p>如果多对多的关系在你的数据中很常见，关系模型可以处理多对多关系的简单情况，但是随着数据之间的连接变得复杂，将数据建模成为图形显得更加自然。</p>
+
+<p>一个图由两种对象组成：顶点和边。</p>
+
+<p>多种数据可以被建模成为一个图形，比如社交图谱（顶点是人，边指示哪些人彼此认知）网络图谱（顶点是网页，边缘表示指向其他页面的HTML链接）等等。</p>
+
+<p>有几种不同但是相关的方法来构建和查询图表中的数据，比如属性图模型和三元组存储模型。</p>
+
+<h3 id="属性图">属性图</h3>
+
+<p>属性图模型中每个结点包括：</p>
+<ul>
+  <li>唯一的标识符</li>
+  <li>一组出边</li>
+  <li>一组入边</li>
+  <li>一组属性（键值对）</li>
+</ul>
+
+<p>每个边包括：</p>
+<ul>
+  <li>唯一标识符</li>
+  <li>边的起点/尾部顶点</li>
+  <li>边的终点/头部顶点</li>
+  <li>描述两个顶点之间关系类型的标签</li>
+  <li>一组属性(键值对)</li>
+</ul>
+
+<p>可以将图存储看做两个关系表组成，一个存储顶点另一个存储边。</p>
+
+<ol>
+  <li><strong>任何</strong>顶点都可以有一条边连接到<strong>任何</strong>其他顶点</li>
+  <li>给定任何顶点，可以高效找到入边和出边，从而遍历图。</li>
+  <li>通过不同类型的关系使用不同的标签，可以在一个图中存储几种不同的信息，同时仍然保持一个清晰的数据模型。</li>
+</ol>
+
+<p>这些特性为数据建模提供了很大的灵活性。以及具有可演化性。</p>
+
+<p>并且图数据库还有相应的声明式查询语言。查询优化程序会自动选择预测效率最高的策略。</p>
+
+<p>倒是也可以在SQL中表示图数据并且进行查询，只是很困难很麻烦罢了。</p>
+
+<h3 id="三元组存储">三元组存储</h3>
+
+<p>三元组存储模式大体上与属性图模型相同，用不同的词来描述相同的想法。</p>
+
+<p>三元组存储中，所有信息都以三部分表示形式存储（主语，谓语，宾语）比如（吉姆，喜欢，香蕉）</p>
+
+<p>三元组的主语相当于图中的一个顶点。而宾语是下面两者之一：</p>
+<ol>
+  <li>原始数据类型中的值，利用字符串或数字。此时三元组的谓语和宾语相当于主语顶点上的属性的键和值。例如，(lucy,age,33)等价于顶点lucy,并且属性{“age”:33}.</li>
+  <li>图中的另一个顶点。在这种情况下，谓语是图中另一条边，主语是其尾部顶点，宾语是头部顶点。例如，在(lucy,marriedTo,alain)中主语和宾语lucy和alain都是顶点，并且谓语marriedTo是连接他们的边的标签。</li>
+</ol>
+
+<p>例子：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@prefix : &lt;urn:example:&gt;.
+_:lucy a :Person.
+_:lucy :name "Lucy".
+_:lucy :bornIn _:idaho.
+_:idaho a :Location.
+_:idaho :name "Idaho".
+_:idaho :type "state".
+_:idaho :within _:usa.
+_:usa a :Location
+_:usa :name "United States"
+_:usa :type "country".
+_:usa :within _:namerica.
+_:namerica a :Location
+_:namerica :name "North America"
+_:namerica :type :"continent"
+</code></pre></div></div>
+
+<p>当谓语表示边时，该宾语是一个顶点。当谓语是一个属性时，该宾语是一个字符串。</p>
+
+<h3 id="图数据库与网络模型的比较">图数据库与网络模型的比较</h3>
+
+<ul>
+  <li>在CODASYL中，数据库有一个模式，用于指定哪种记录类型可以嵌套在其他记录类型中，在图数据库中，不存在这样的限制，任何顶点都可以具有到其他任何顶点的边，这为应用程序适应不断变化的需求提供了更大的灵活性。</li>
+  <li>在CODASYL中，到达特定的记录的唯一方法是遍历一个访问路径，但是图数据库中可以用唯一ID直接引用任何顶点，也可以使用索引来查找具有特定值的顶点。</li>
+  <li>在CODASYL中，记录的后续是一个有序集合，所以数据库的人得维持排序，并且插入新记录的应用程序不得不担心新纪录在集合中的位置，在图形数据库中，顶点和边不是有序的（只能在查询时对结果进行排序）</li>
+  <li>在CODASYL中，所有查询都是命令式的难以编写，并且很容易因为架构中的变化而受到破坏。在图形数据库中，如果需要也可以用命令式代码，但是绝大数图数据库也支持高级声明式查询语言。</li>
+</ul>
+
+<h2 id="小结">小结</h2>
+
+<ol>
+  <li>文档数据库的应用场景是：数据通常是自我包含的，而且文档之间的关系非常稀少。</li>
+  <li>图形数据库应用与相反的场景：任意事物都可能与任何事物相关联。</li>
+</ol>
+
+<p>文档、关系和图形这三种模型在今天都被广泛应用且在<strong>各自的领域</strong>发挥很好。一个模型也可以用另一个模型来模拟。例如可以用关系数据库模拟图数据，但是结果往往糟糕。这就是为什么我们有着不同目的的不同系统，而不是一个单一的万能解决方案。</p>
+
+<p>文档数据库和图数据库有一个共同点，通常不会为存储的数据强制一个模式，这可以使得应用程序容易适应不断变化的需求。但是应用程序可能仍然会假定数据具有一定的结构，这只是模式是明确的（写入时强制）还是隐含的（读取时处理）的问题。</p>
+
+
+</article>
+      </div>
+    </main>
+  </body>
+</html>
