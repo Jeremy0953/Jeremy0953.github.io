@@ -1,5 +1,685 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-10-17T23:13:22+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">This is Jeremy!</title><subtitle>Carpe Diem
-</subtitle><author><name>Jeremy Yang</name></author><entry><title type="html">数据模型与查询语言</title><link href="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html" rel="alternate" type="text/html" title="数据模型与查询语言" /><published>2021-10-17T00:00:00+08:00</published><updated>2021-10-17T00:00:00+08:00</updated><id>http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80</id><content type="html" xml:base="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html">&lt;h2 id=&quot;toc&quot;&gt;TOC&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2021-10-27T19:23:54+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">This is Jeremy!</title><subtitle>Carpe Diem
+</subtitle><author><name>Jeremy Yang</name></author><entry><title type="html">数据编码与演化</title><link href="http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html" rel="alternate" type="text/html" title="数据编码与演化" /><published>2021-10-27T00:00:00+08:00</published><updated>2021-10-27T00:00:00+08:00</updated><id>http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96</id><content type="html" xml:base="http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html">&lt;h1 id=&quot;数据编码与演化&quot;&gt;数据编码与演化&lt;/h1&gt;
+
+&lt;h2 id=&quot;toc&quot;&gt;TOC&lt;/h2&gt;
+
+&lt;p&gt;应用程序会随时间发生变化，大多数情况下，更改应用程序功能时也需要更改其存储的数据：可能需要捕获新的字段或者记录类型或者以新的方式呈现已有数据。&lt;/p&gt;
+
+&lt;p&gt;对于大型应用系统：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;对于服务器端，可能要滚动更新（分阶段发布），每次将新版本部署到少量节点，看能否正常运行，然后逐步在所有节点更新新的代码。这样新版本部署无需服务暂停，从而支持更频繁的版本发布和更好的演化。&lt;/li&gt;
+  &lt;li&gt;对于客户端，只能寄希望于用户，然而他们在一段时间内可能不会更新新的版本。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这意味着&lt;strong&gt;新旧版本的代码和新旧数据格式，可能会同时在系统内共存&lt;/strong&gt;。为了保证兼容性，需要保持双向兼容性：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;向后兼容——新的代码可以读取旧代码编写的数据&lt;/li&gt;
+  &lt;li&gt;向前兼容——较旧代码可以读取新代码编写的数据&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;向后兼容不难实现，因为新代码的作者清楚旧代码的编写格式，向前兼容比较难，因为需要旧代码忽略新代码所做的添加。&lt;/p&gt;
+
+&lt;h2 id=&quot;数据编码格式&quot;&gt;数据编码格式&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;内存中，数据保存在对象，结构体，数组，哈希表等数据结构中。（也就是说可以用指针引用之类的）&lt;/li&gt;
+  &lt;li&gt;将数据写入文件或者向网络中发送时，必须编码为字节序列。（由于指针对于别的进程没有什么意义，所以使用的数据结构就有所不同）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;从内存中的表示到字节序列的转化称为编码（或序列化），相反的过程叫做解码（或解析，反序列化）。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;语言特定的格式&quot;&gt;语言特定的格式&lt;/h2&gt;
+
+&lt;p&gt;很多编程语言都内置支持将内存中的对象编码为字节序列比如Java有java.io.Serializable 等。但是他们存在问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;编码格式和语言绑定，用另一种语言访问很难。&lt;/li&gt;
+  &lt;li&gt;为了在相同的对象类型中恢复数据，解码过程要能&lt;strong&gt;实例化任意的类&lt;/strong&gt;。这可能导致一些安全隐患。&lt;/li&gt;
+  &lt;li&gt;这些库没有考虑向前兼容和向后兼容的问题。&lt;/li&gt;
+  &lt;li&gt;效率问题（编码解码的时间，还有编码结构的大小）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;json-xml和二进制变体&quot;&gt;JSON XML和二进制变体&lt;/h2&gt;
+&lt;p&gt;XML经常被批评过于冗长和不必要的复杂。JSON受欢迎主要由于它在Web浏览器中内置支持，以及简单。CSV很流行，尽管功能很弱。&lt;/p&gt;
+
+&lt;p&gt;JSON,XML,CSV都是文本格式都有着不错的可读性，但是也有问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;数字编码有模糊之处：XML 和CSV中无法区分数字和由数字构成的字符串，JSON可以区分数字和字符串但是无法区分整数和浮点数。&lt;/li&gt;
+  &lt;li&gt;JSON,XML对Unicode字符串有很好的支持但是不支持二进制字符串（没有字符编码的字符序列）
+    - XML和JSON都有可选的模式支持。模式学习和实现比较复杂，而且没有使用这些的应用只能硬编码编码解码的逻辑。
+    &lt;ul&gt;
+      &lt;li&gt;CSV没有任何模式，所以程序需要定义每行没列的含义。如果应用程序添加新的行和列，则需要手动处理更改。&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;尽管这些数据模式存在缺陷，但是他们也很受欢迎，毕竟过，让不同的组织达成一致的难度通常超过了其他所有问题。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;二进制编码&quot;&gt;二进制编码&lt;/h3&gt;
+&lt;p&gt;JSON不像XML那样冗长，但是与二进制格式相比还是占了大量空间。这导致开发了大量的二进制编码用以支持JSON（比如MessagePack和BISON）&lt;/p&gt;
+
+&lt;p&gt;其中一些格式还扩展了数据类型集，但其他格式保持了JSON/XML数据模型不变。特别是他们没有规定模式（schema）所以需要在编码数据时包含所有的对象字段名称。&lt;/p&gt;
+
+&lt;p&gt;一条样本记录&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{
+	    “username”:”Martin”,
+		    “favoriteNumber”:1337,
+			    “interests”:[“daydreaming”,”hacking”]
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;看一个MessagePack的例子。
+  &lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-27-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- 0x83——表示接下来是包含三个字段（第四位0x03）的对象（高四位0x80）
+ - 0xa8——便是接下来是八个字节长度的字符串（高四位0xa0，第四位0x08）
+  - 后面是八字节的ASCII的userName
+   - 以此类推
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;thrift与protocol-buffers&quot;&gt;Thrift与Protocol Buffers&lt;/h2&gt;
+
+&lt;p&gt;Apache Thrift和Protocol Buffers是基于相同原理的两种二进制编码库。他们都需要模式来编码任意的数据。&lt;/p&gt;
+
+&lt;p&gt;Thrift模式定义&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;struct Person {
+	   1: required string  userName,
+	      2: optional i64  favoriteNumber,
+		     3: optional list&amp;lt;string&amp;gt; interests
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Protocol Buffers等价模式定义&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;message Person {
+	  required string user_name  = 1;
+	    optional int64 favorite_number  = 2;
+		  repeated string interests  = 3;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Thrift有两种不同的二进制编码格式，分别称为BinaryProtocol和CompactProtocol。
+下图是BinaryProtocol。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-27-pic2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;与MessagePack相比最大的区别是字段名用字段标签（1，2，3）这些是模式定义中出现的数字，是字段名称的别名，用来指示当前字段。&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CompactProtocol语义上等同于BinaryProtocol。他将字段类型和标签号打包到单字节中，并使用可变长度整数来实现。对于数字1337，不使用全部8字节而是使用两个字节。每个字节的最高位用来指示是否还有更多的字节。
+
+  ![](https://jeremy0953.github.io/pics/2021-10-27-pic3.png)
+
+  最后还有Protocol Buffers
+   ![](https://jeremy0953.github.io/pics/2021-10-27-pic4.png)
+
+   最后有一个小细节，模式中每一个字段被标记为了required和optional，但是这段字段如何编码没有任何影响，如果字段设置了required但是字段没有填充，运行时检查将会出现失败。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;字段标签和模式演化&quot;&gt;字段标签和模式演化&lt;/h3&gt;
+
+&lt;p&gt;模式不可避免地需要随着时间而不断变化，称之为模式演化。那么这两种是如何在向前兼容和向后兼容的同时应对模式更改呢？&lt;/p&gt;
+
+&lt;p&gt;一条编码记录指示一组编码字段的拼接，每个字段由其标签号标识并使用数据类型进行注释。如果没有设置字段值则将其从编码的记录中简单地忽略。由此可以看出字段标签（field tag）对于编码数据的含义至关重要。可以轻松更改模式中字段的名称，编码永远不直接引用字段名称，但是不能随便更改字段的标签，否则会导致所有现有编码数据无效。&lt;/p&gt;
+
+&lt;p&gt;添加字段时：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;向前兼容：如果旧代码读新代码写入的数据，如果有他不能识别的标记号码直接忽略就好。&lt;/li&gt;
+  &lt;li&gt;向后兼容：每个字段有唯一的标记号码，所以新的代码总是能知道旧数据的标记号码，唯一的细节是如果添加一个新的字段则不能使其成为必需字段（required）因为旧代码不会添加新字段，为了保证向后兼容，在模式的初始部署之后添加的每个字段都必须是可选的或者是有默认值的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;删除字段就像添加字段一样，不过向前兼容和向后兼容正好相反。这意味着只能删除可选的字段（必填字段永远不能被删除）而且不能输再次使用相同的标签号码（因为可能有写入的数据包含旧的标签号码，该字段必需被新代码忽略）&lt;/p&gt;
+
+&lt;h3 id=&quot;数据类型和模式演化&quot;&gt;数据类型和模式演化&lt;/h3&gt;
+
+&lt;p&gt;如何改变字段的数据类型呢？这是有可能的，但是存在值会丢失或者被截断的风险。&lt;/p&gt;
+
+&lt;h2 id=&quot;avro&quot;&gt;Avro&lt;/h2&gt;
+
+&lt;p&gt;Avro是另一种二进制编码格式，也适用模式来指定编码，有两种模式语言，一种(Avro IDL)用于人工编辑，另一种（基于JSON）更易于机器读取。&lt;/p&gt;
+
+&lt;p&gt;用Avro IDL编写的事例模式如下所示：&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;record Person {
+	  string  username;
+	    union {null, long}  favoriteNumber = null;
+		  array&amp;lt;string&amp;gt; interests;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;该模式的等价JSON表示如下：&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{
+	  “type”: “record”,
+	    “name”: “Person”,
+		  “field”: [
+		      {“name”: “userName”,  “type”: “string”},
+			      {“name”: “favoriteNumber”, “type”:[“null”, “long”], “default”: null},
+				      {“name”: “interests”, “type”: {“type”: “array”, “items”: “string”}} 
+					    ]
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;首先，注意模式中&lt;strong&gt;没有标签编号&lt;/strong&gt;。如果用这个编码模式表示事例记录，只有32字节，这是所见到的所有编码中最紧凑的。编码字节序列分解如图所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-27-pic5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如图所示，可以看到没有什么标识字段或者数据类型。编码只是由连在一起的一些列值组成。一个字符串只是一个长度前缀后面跟着UTF-8字节流，但是编码数据里面没有告诉你它是一个字符流。它也可以是一个整数，或者其他什么类型，整数使用可变长度编码（与CompactProtocol相同）进行编码。&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; 为了解析，按照他们出现在模式中的顺序遍历这些字段，然后直接采用模式告诉你每个字段的数据类型，意味着读取数据代码使用的模式必需和写入数据使用的模式完全相同。如果不匹配就无法解析。
+  
+   *那么Avro如何支持编码演化？*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;写模式与读模式&quot;&gt;写模式与读模式&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;	- 写模式：编码应用程序所用的模式（例如可以编译到应用程序中的模式）
+	- 读模式：应用程序解码，期望数据所希望的模式（应用程序依赖的模式，应用程序代码都有可能是根据读模式动态生成的）
+
+	Avro的关键思想，**写模式和读模式不一定是完全一模一样**，只需要保持兼容即可，Avro库会自动对比查看写模式和读模式并将数据从写模式转换为读模式来解决差异。
+
+	 例如，如果读写模式的字段顺序不同也没关系，如果读取的代码遇到写模式里有但是读模式没有的就忽略它，如果读模式遇到了需要读但是写模式里面没有的就直接使用默认值。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;模式演化规则&quot;&gt;模式演化规则&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;	   - 向前兼容： 新版本的writer，旧版本的reader
+	   - 向后兼容： 旧版本的writer，新版本的reader
+
+	   为了保持兼容性，只能添加和删除有**默认值**的字段。
+
+	   比如读模式里面加了一个字段，但是旧的写模式里面没有，读取的时候就直接使用默认值。
+
+	   更改模式字段名称和向联合类型添加分支都是向后兼容的，但是不能向前兼容。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;writer模式是什么&quot;&gt;writer模式是什么？&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;reader如何知道特定的数据采用哪个writer的模式编码的？&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;在每个记录中都包含整个模式不现实因为有时模式甚至比编码数据还要大很多。答案取决于Avro的上下文。例如：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;有很多记录的大文件：所有的记录都用相同的模式进行编码，这种情况下该文件的writer可以仅在文件的开头包含writer的模式信息。&lt;/li&gt;
+  &lt;li&gt;具有单独写入记录的数据库：不同的记录可能会在不同的时间点使用不同的writer进行编写，最简单的方法是在每个编码记录的开始处包含一个写模式的版本号，并在数据库里面保留一个模式版本列表。reader可以获取记录，提取版本号，并且从数据库中查询版本号对应的writer模式，使用该writer模式解码记录的其余部分。&lt;/li&gt;
+  &lt;li&gt;使用网络连接发送记录：建立通信时协商模式版本，然后在连接的生命周期中使用该模式。这也是Avro RPC协议的基本原理。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在任何情况下，提供一个模式版本信息的数据库都很有用，可以充当一个说明文档来检查系统的兼容性。&lt;/p&gt;
+
+&lt;h3 id=&quot;动态生成的模式&quot;&gt;动态生成的模式&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Avro的一个优点是不包含任何标签号。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;比如一个关系数据库想要把它的内容转储到一个文件中，并且要用二进制格式，可以使用Avro，然后如果数据库模式发生变化（比如加了一列），就可以生成新的Avro模式，用新的模式导出数据即可，每次运行时都可以简单的进行模式转换，由于字段是通过名字来标识的，所以新writer和旧的reader可以匹配。&lt;/p&gt;
+
+&lt;p&gt;相比之下Thrift或者Protocol Buffers需要手动分配字段标签，每次数据库模式更改时都需要手动更新数据库列名到字段标签的映射（虽然可能可以自动化，但是生成器必需十分小心，不能分配以前使用的字段标签）这种动态生成的模式是Avro的目标。&lt;/p&gt;
+
+&lt;h3 id=&quot;代码生成和动态类型语言&quot;&gt;代码生成和动态类型语言&lt;/h3&gt;
+
+&lt;p&gt;Thrift和Protocol Buffers依赖于代码生成，定了模式之后，可以使用静态类型编程语言生成此模式的代码。动态类型编程语言生成代码没太大意义，因为他们避免了明确的编译过程。对于动态生成的模式（比如Avro），代码生成反而是一个障碍。&lt;/p&gt;
+
+&lt;p&gt;Avro为静态类型编程语言提供了可选的代码生成，而且也可以在不生成代码的情况下直接使用。如果有对象容器文件，可以简单地使用Avro库打开它，并用和查看JSON文件一样查看数据。（该文件里面嵌入了writer模式，他是自描述的）&lt;/p&gt;
+
+&lt;h3 id=&quot;模式的优点&quot;&gt;模式的优点&lt;/h3&gt;
+
+&lt;p&gt;尽管JSON、XML和CSV文本数据格式非常普遍，基于模式的二进制编码也有很多不错的属性：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;他们比很多“二进制JSON”变体更紧凑，可以忽略字段名称&lt;/li&gt;
+  &lt;li&gt;模式是一种有价值的文档&lt;/li&gt;
+  &lt;li&gt;模式数据库允许在部署任何内容之前检查模式更改的向前和向后兼容性&lt;/li&gt;
+  &lt;li&gt;对于静态类型编程语言用户来说，从模式生成代码的能力是有限的，它能够在编译时自动检查&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;数据流模式&quot;&gt;数据流模式&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;数据可以通过多种方式从一个进程流向另一个进程。谁编码数据？谁解码数据？&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;基于数据库的数据流&quot;&gt;基于数据库的数据流&lt;/h3&gt;
+
+&lt;p&gt;数据库中的值可能由较新版本的代码写入，然后由仍运行的旧版本代码读取（因为滚动升级中某些实例已经更新，某些实例没有更新）&lt;/p&gt;
+
+&lt;p&gt;数据库当然要支持向后兼容（不然无法读取之前的值了）&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意&lt;/strong&gt;：比如记录模式中增加了一个字段，然后用旧的模式去读，更新记录并且写回，理想的行为是旧代码保持新字段不变即使无法解释。&lt;/p&gt;
+
+&lt;p&gt;但是有时比如解释成应用程序中的对象，然后重新编码就有可能丢失未知字段，解决这个问题不难但是要有这个意识。&lt;/p&gt;
+
+&lt;h4 id=&quot;不同时间写入不同的值&quot;&gt;不同时间写入不同的值&lt;/h4&gt;
+
+&lt;p&gt;服务端的应用程序可能会在几分钟内用新版本完全替代旧版本，但是数据库不会这样，五年前的数据仍然采用原始编码，除非已经明确重写了他，这种现象有时被称为&lt;strong&gt;数据比代码更长久&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;将数据重写（迁移）到新模式是可能的，但是代价太大了。&lt;/p&gt;
+
+&lt;p&gt;很多数据库尽可能避免这种操作，关系型数据库允许进行简单的模式更改，例如添加如有默认值为空的新列，而不重写所有数据。读取旧行时数据库会为磁盘上数据缺失的所有列填充为空值。&lt;/p&gt;
+
+&lt;p&gt;因此演化支持整个数据库看起来像是采用单个模式编码，即使底层存储可能包含各个版本模式所编码的记录。&lt;/p&gt;
+
+&lt;h4 id=&quot;归档存储&quot;&gt;归档存储&lt;/h4&gt;
+
+&lt;p&gt;当为数据库备份或者加载到数据仓库时，数据转储通常使用最新的模式进行编码，由于无论何时都要复制数据，所以此时最好对数据副本进行统一的编码。&lt;/p&gt;
+
+&lt;p&gt;由于数据转储是一次性写入的，而且以后不会变，因此像Avro对象容器文件这样的格式非常适合。也可以使用列存储。&lt;/p&gt;
+
+&lt;h3 id=&quot;基于服务的数据流rest和rpc&quot;&gt;基于服务的数据流：REST和RPC&lt;/h3&gt;
+
+&lt;p&gt;网络通信的进程有多种通信方式，最常见的有客户端和服务器。服务器通过网络公开API，客户端可以连接到服务器以向该API发出请求。服务器公开的API称为服务。&lt;/p&gt;
+
+&lt;p&gt;客户端可以向服务器发出网络请求，此外，服务器本身可以是另一项服务的客户端（比如web应用服务器作为数据库的客户端）这种方法通常用于将大型应用程序按照功能区域分解为较小的服务，当一个服务需要另一个服务的某些功能或者数据时，就会向另一个服务发出请求。这种构建应用的方式叫做面向服务的体系结构（ service-oriented-architecture, SOA)，最近更名为微服务体系结构(microservices architecture)&lt;/p&gt;
+
+&lt;p&gt;服务类似于数据库，但是服务公开了特定应用程序的API，他只允许由服务的业务逻辑预定的输入和输出。服务可以对客户端可以做什么不可以做什么施加细粒度的限制。&lt;/p&gt;
+
+&lt;p&gt;微服务的设计目标：通过使服务可以独立部署和演化，让应用程序更加易于更改和维护。&lt;/p&gt;
+
+&lt;p&gt;网络服务：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;运行在客户端的应用程序通过HTTP请求服务。&lt;/li&gt;
+  &lt;li&gt;一种服务向同一个组织的另一个服务提出请求（这类软件有时叫做中间件）。&lt;/li&gt;
+  &lt;li&gt;一种服务向不同组织的服务提出请求。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;REST：是一个基于HHTP原则的设计理念，它强调简单的数据格式，使用URL来标识资源，并使用HTTP功能进行缓存控制，身份验证和内容类型协商。&lt;/p&gt;
+
+&lt;p&gt;根据REST原则设计的API称为RESTful&lt;/p&gt;
+
+&lt;p&gt;远程过程调用（RPC)的问题&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;本地调用是可预测的，并且成功和失败只取决于参数。网络请求无法预测，请求或响应可能因为网络问题而丢失，或者因为远程计算机可能速度慢或者不可用。&lt;/li&gt;
+  &lt;li&gt;本地函数调用要么返回结果要么抛出一个异常，或者永远不会返回，但是网络请求有可能因为超时返回时可能没有结果，不知道请求是否成功。&lt;/li&gt;
+  &lt;li&gt;如果重试失败的请求，有可能请求已经完成，只是响应丢失而已，重试的话导致操作被执行多次。&lt;/li&gt;
+  &lt;li&gt;每次本地调用所用时间大致相同，远程调用的时间会慢很多，而且也会有很大变化。&lt;/li&gt;
+  &lt;li&gt;调用本地函数时可以传指针（高效），但是远程调用只能编码成网络传输的字节序列，当对象比较大时可能会出现问题。&lt;/li&gt;
+  &lt;li&gt;客户端可能有不同语言，所以RPC框架必需可以将数据类型从一个语言转化成另一个语言，最终可能会比较丑陋。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;基于消息传递的数据流&quot;&gt;基于消息传递的数据流&lt;/h3&gt;
+
+&lt;p&gt;异步消息传递系统。&lt;/p&gt;
+
+&lt;p&gt;和RPC相比，消息代理（称为消息队列，或面向消息的中间件）的优点：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;如果接收方不可用或过载，可以充当缓存区，从而提高系统的可靠性。&lt;/li&gt;
+  &lt;li&gt;可以自动将消息重新发送到崩溃的进程，从而防止消息丢失。&lt;/li&gt;
+  &lt;li&gt;避免了发送方需要知道接收方的IP地址和端口号（这在虚拟机和经常启停的云部署中特别有用）&lt;/li&gt;
+  &lt;li&gt;它支持将一条消息发送给多个接收方。&lt;/li&gt;
+  &lt;li&gt;它在逻辑上将发送方和接收方分离（发送方只是发布消息，并不关心谁使用他们）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;然而和RPC相比，消息队列通常是单向的。发送方通常不期望响应，哪怕有响应也是在一个独立的通道完成。这种通信模式是异步的，只是发送然后忘记它。&lt;/p&gt;
+
+&lt;p&gt;消息代理的使用方式如下：一个进程向指定的队列或者主题发布消息，代理保证消息被传递给队列或主题的一个或多个消费者或订阅者，在同一个主题上可以有多个生产者和消费者。&lt;/p&gt;
+
+&lt;p&gt;主题只提供单向数据流，但是消费者本身可能会将消息发布到另一个主题，也可以发送到一个回复队列，该队列由初始消息发送者来消费。&lt;/p&gt;
+
+&lt;h4 id=&quot;actor框架&quot;&gt;Actor框架&lt;/h4&gt;
+
+&lt;p&gt;Actor模型是用于单个进程中并发的编程模型。逻辑被封装在Actor中，而不是直接处理线程（以及竞争条件，锁定和死锁的相关问题）每个Actor通常代表一个客户端或者实体，可能具有某些本地状态，通过发送和接收异步消息与其他Actor通信。不保证消息传送，在某些情况下，消息会丢失。由于每个Actor一次只处理一个消息，因此不用担心线程，每个Actor都可以由框架独立调度。&lt;/p&gt;
+
+&lt;p&gt;分布式Actor框架，这个模型被用来跨越多个节点扩展应用程序。&lt;/p&gt;</content><author><name>Jeremy Yang</name></author><category term="DDIA" /><summary type="html">数据编码与演化</summary></entry><entry><title type="html">存储与检索</title><link href="http://localhost:4000/%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A3%80%E7%B4%A2.html" rel="alternate" type="text/html" title="存储与检索" /><published>2021-10-24T00:00:00+08:00</published><updated>2021-10-24T00:00:00+08:00</updated><id>http://localhost:4000/%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A3%80%E7%B4%A2</id><content type="html" xml:base="http://localhost:4000/%E5%AD%98%E5%82%A8%E4%B8%8E%E6%A3%80%E7%B4%A2.html">&lt;h2 id=&quot;toc&quot;&gt;TOC&lt;/h2&gt;
+
+&lt;p&gt;一个数据库在最基础的层次上需要完成两件事情：当你把数据交给数据库时，它应当把数据存储起来；而后当你向数据库要数据时，它应当把数据返回给你。&lt;/p&gt;
+
+&lt;h2 id=&quot;驱动数据库的数据结构&quot;&gt;驱动数据库的数据结构&lt;/h2&gt;
+
+&lt;h3 id=&quot;最简单的数据库&quot;&gt;最简单的数据库&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#!/bin/bash
+db_set () {
+echo &quot;$1,$2&quot; &amp;gt;&amp;gt; database
+}
+db_get () {
+grep &quot;^$1,&quot; database | sed -e &quot;s/^$1,//&quot; | tail -n 1
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;使用的时候&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ db_set 123456 '{&quot;name&quot;:&quot;London&quot;,&quot;attractions&quot;:[&quot;Big Ben&quot;,&quot;London Eye&quot;]}' 
+
+$ db_set 42 '{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Golden Gate Bridge&quot;]}'
+
+$ db_get 42
+{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Golden Gate Bridge&quot;]}
+
+$ db_set 42 '{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Exploratorium&quot;]}'
+
+$ db_get 42{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Exploratorium&quot;]}
+
+$ cat database
+123456,{&quot;name&quot;:&quot;London&quot;,&quot;attractions&quot;:[&quot;Big Ben&quot;,&quot;London Eye&quot;]}
+42,{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Golden Gate Bridge&quot;]}
+42,{&quot;name&quot;:&quot;San Francisco&quot;,&quot;attractions&quot;:[&quot;Exploratorium&quot;]}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;底层的存储：一个文本文件，每行包含一条逗号分隔的键值对，每次调用set函数就会追加记录，旧的记录不会被覆盖，所以查找最新值时候，需要找文件中键最后出现的位置。&lt;/p&gt;
+
+&lt;p&gt;优点：在极其简单的场景有很好的性能，因为在文件尾部追加写入很高效。
+缺点：当数据库中有大量记录时，查找性能会很差，因为要从头到尾扫描。查找的开销是O(n)。&lt;/p&gt;
+
+&lt;p&gt;所以我们需要&lt;strong&gt;索引&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;索引是附加结构，只影响查询性能，维护额外的结构会产生开销，特别在写入时，因为追加是最简单的写入操作。任何类型的索引通常都会减慢写入速度，因为每次写入数据都需要更新索引。&lt;/p&gt;
+
+&lt;p&gt;所以这里是一个trade off，数据库不会默认索引所有内容，需要DBA通过查询模式来手动选择索引，从而达到最大收益又不会引入超出必要的开销。&lt;/p&gt;
+
+&lt;h3 id=&quot;哈希索引&quot;&gt;哈希索引&lt;/h3&gt;
+
+&lt;p&gt;之前在各种编程语言中已经接触过哈希映射。&lt;em&gt;既然我们已经有内存中数据结构hashmap，为什么不使用它来索引在磁盘上的数据呢？&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;假设我们的数据存储只是一个追加写入的文件，最简单的想法就是在内存中保存一个hashmap，每个键值映射到数据文件中的字节偏移量。（所有键必须能放入到可用内存中）&lt;/p&gt;
+
+&lt;p&gt;像这种方式适合每个键经常更新的情况。例如key可能是视频的url，value是它播放的次数（每次有人点击播放按钮时递增）。这种工作负载中，有很多写操作，但是没有太多不同的键，也就是说每个键都有很多写操作，并且将所有键保存在内存中是可行的。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;追加写入文件如何避免用完磁盘空间呢？&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;将日志分为特定大小的段，当日志增长到特定尺寸时关闭当前段文件，开始写入一个新的段文件，然后对这些段进行压缩（compaction）。压缩是在日志中丢弃重复的键，保留键的最近更新。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以同时进行压缩和分段合并，在进行过程中我们可以依旧用旧的段来正常提供读写操作。合并完成后，我们开始使用新的合并段然后可以删除掉旧的段文件。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;真正投入实际应用时需要面临的一些问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;文件格式，使用二进制格式会更快更简单（需要以字节单位对字符串进行编码）&lt;/li&gt;
+  &lt;li&gt;删除记录，需要在文件中添加一个删除记录，在合并时放弃删除键的任何以前的值&lt;/li&gt;
+  &lt;li&gt;崩溃恢复，如果数据库重新启动，内存散列映射会丢失，原则上可以重新从头到尾读取整个段文件然后进行恢复，如果段文件很大就不太好，Bitcask通过存储加速恢复磁盘上每个段的哈希映射的快照，可以更快地加载到内存中。&lt;/li&gt;
+  &lt;li&gt;部分写入记录，数据库随时可能崩溃，包括记录附加到日志中途。Bitcask文件包含校验和，可以检测日志中的损坏部分。&lt;/li&gt;
+  &lt;li&gt;并发控制，由于写是append模式，所以一般只有一个写入器线程，数据文件段是追加且不可变的所以可以被多个线程同时读取。为什么要用append追加而不是像文件一样覆盖呢？
+    &lt;ul&gt;
+      &lt;li&gt;追加和分段合并是顺序写入，比随机写入块，尤其是在磁盘上&lt;/li&gt;
+      &lt;li&gt;如果段文件是附加或不可变的，并发和崩溃恢复就会很简单，不必担心覆盖值时发生崩溃从而出现既有新值又有旧值。&lt;/li&gt;
+      &lt;li&gt;合并旧段可以避免数据文件随着时间推移而分散的问题&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;哈希表的局限性：
+    &lt;ul&gt;
+      &lt;li&gt;散列表必须能全部放进内存，原则上其实可以在磁盘上保留一个hashmap但是磁盘hashmap由于有很多随机访问I/O所以表现不好。&lt;/li&gt;
+      &lt;li&gt;范围查询效率不高。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;sstables和lsm树&quot;&gt;SSTables和LSM树&lt;/h3&gt;
+
+&lt;p&gt;上述日志文件键值对的排序只和写入顺序有关，日志中稍后的值优先于较早的值，除此之外文件中的键值对的顺序并不重要。&lt;/p&gt;
+
+&lt;p&gt;我们做一个小小的变动：要求键值对按照key排序。&lt;/p&gt;
+
+&lt;p&gt;我们称这个格式为&lt;strong&gt;排序字符串表(Sorted String Table)&lt;/strong&gt;，简称SSTable。我们要求每个键只在合并的段文件中出现一次。&lt;/p&gt;
+
+&lt;p&gt;SST的优势：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;合并段简单高效，即使文件大于可用内存。过程就像归并排序中的归并。（如果几个输入段出现了相同的键就只保留最新的）&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic3.png&quot; alt=&quot;&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;为了在文件中找到一个特定的key不需要保存所有键的索引，可以知道某个key如果存在就一定在key1和key2之间（其中key1&amp;lt;key&amp;lt;key2）。如果没找到就证明没有这个key。但是仍然需要一些索引告诉某些键的偏移量，不过可以很稀疏了。&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic4.png&quot; alt=&quot;&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;然后就可以将记录分组到块中，对块进行压缩，稀疏索引指向块的开始处。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;磁盘上有序结构有B树之类的，内存中的有序结构有比如红黑树和AVL树，这些数据结构可以任意顺序插入键并且按排序顺序读取他们。&lt;/p&gt;
+
+&lt;p&gt;此时我们的存储引擎工作流程：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;写入时，将其添加到内存中的平衡树数据结构，有时称为内存表(memtable)&lt;/li&gt;
+  &lt;li&gt;当内存表大于阈值，将其作为SST写入磁盘（因为已经在内存中排序了所以高效写入）当SST被写入磁盘时，数据库中新的数据写入可以写入到一个新的内存表实例&lt;/li&gt;
+  &lt;li&gt;读取请求时先尝试在内存表中找到关键字，然后在最近的磁盘段，或者更久的磁盘段去找。&lt;/li&gt;
+  &lt;li&gt;后台运行合并压缩过程的同时丢弃或覆盖旧的值&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这个方案很好，只是会遇到一个问题，当系统崩溃时，最近内存表的写入会丢失，所以我们要在磁盘上保存一个append的日志用来恢复memtable，当memtable被成功写入sst时日志就可以丢弃了。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Log structure merge tree 日志结构合并树(LSM树)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;LSMTree的缺点：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;当查找数据库中不存在的key时，LSM树算法可能会很慢。（因为必须从Memtable一直找到最老的SST才能确定键不存在）为了优化这个访问，存储引擎通常用&lt;strong&gt;布隆过滤器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;压缩合并的不同策略：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;leveled compaction:关键范围被拆分成更小的SST，旧的数据被移动到单独的水平，使得压缩能都递增进行，减少磁盘空间&lt;/li&gt;
+  &lt;li&gt;size-tiered compaction:新的和更小的SST被合并到更老的和更大的SST&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;有关LSM这里两种策略的对比可以看&lt;a href=&quot;https://www.alibabacloud.com/blog/an-in-depth-discussion-on-the-lsm-compaction-mechanism_596780&quot;&gt;An In-depth Discussion on the LSM Compaction Mechanism&lt;/a&gt;这篇博客进行进一步了解。&lt;/p&gt;
+
+&lt;p&gt;LSMTree的优点：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;即使数据集比可用内存大仍然能够继续工作&lt;/li&gt;
+  &lt;li&gt;由于数据集按照排序存储所以可以高效执行范围查询&lt;/li&gt;
+  &lt;li&gt;因为磁盘写入是连续的，所以LSMTree支持非常高的写入吞吐量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;有关LSMTree中的KV分离存储内容可以看迟先生的这篇文章&lt;a href=&quot;https://www.skyzh.dev/posts/articles/2021-08-07-lsm-kv-separation-overview/&quot;&gt;LSM 存储引擎中 KV 分离的实现&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;b树&quot;&gt;B树&lt;/h3&gt;
+
+&lt;p&gt;B树将数据库分解成固定大小的块或者页面，一次只读取或写入一个页面。设计更接近底层硬件，因为磁盘也被安排在固定大小的块中。&lt;/p&gt;
+
+&lt;p&gt;每个页面用地址来标识，允许一个页面引用另一个页面（类似指针）。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有关B树的查找，添加，删除，本科数据库课程已经讲得很详细了，比如添加的时候如果页面中没有足够空间就分裂半满页面，删除的时候向兄弟借，(hhh如果想要回顾一下可以翻阅邹老师的PPT)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;具有n个键的B树总是有O(logn)的深度。大多数数据库可以放入一个三到四层的B树（分支因子为500的4KB页面的四级树可以存储多达256TB）&lt;/p&gt;
+
+&lt;p&gt;B树可靠性：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;为了防止比如页面分裂合并时出现崩溃，会导致一个损坏的索引（可能会有一个孤儿页面不是任何父项的子项），B树通常会有额外的数据结构，预写式日志（WAL，write-ahead-log）当数据库崩溃后用这个恢复一致性。&lt;/li&gt;
+  &lt;li&gt;多线程访问，需要锁来保护，但是log-structure的方法在并发控制这里更易于实现，因为后台所有合并不会干扰传入的查询。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;B树优化：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;用写时复制，而不是覆盖页面并且用WAL进行崩溃恢复。修改的页面被写入不同的位置，树中父页面的新版本被创建指向新的位置。&lt;/li&gt;
+  &lt;li&gt;不存储整个键，而是可以缩小键的大小。&lt;/li&gt;
+  &lt;li&gt;B树尝试布局树，让叶子页面顺序出现在磁盘上。相比之下LSM树在合并时更容易使得顺序键在磁盘上彼此靠近。&lt;/li&gt;
+  &lt;li&gt;树中加入额外的指针，每个叶子有对两个兄弟的引用，这样可以直接扫描&lt;/li&gt;
+  &lt;li&gt;分形树借用日志结构的思想来减少磁盘寻道。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在数据库的生命周期中写入数据库导致对磁盘的多次写入——被称为&lt;strong&gt;写放大（write amplification）&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;B Tree&lt;/th&gt;
+      &lt;th&gt;LSMTree&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;读取速度更快&lt;/td&gt;
+      &lt;td&gt;写入速度更快&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;一段数据写的时候至少写两次，一次写入WAL，一次写入树页面本身，如果分页就更多&lt;/td&gt;
+      &lt;td&gt;由于反复压缩合并SST，也会重写数据&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;必须覆盖树中的几个页面，随机写入&lt;/td&gt;
+      &lt;td&gt;LSM比B树支持较高的写入吞吐量，部分因为LSM有时具有较低的写放大，部分因为他们顺序写入紧凑的SST文件而不是必须覆盖树中几个页面，磁盘上顺序写入比随机写入快得多&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;由于分割会留下一些未使用的磁盘空间&lt;/td&gt;
+      &lt;td&gt;LSM会压缩地更好，由于不是面向页面并且定期重写SST清除碎片，有更低的存储开销，尤其是用leveled compaction&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;B树行为更具可预测性&lt;/td&gt;
+      &lt;td&gt;压缩过程有时会干扰读写，磁盘资源有限，很容易发生请求需要等待磁盘完成昂贵的压缩操作，在高百分位点的轻快下，有时响应时间会很长，如果压缩速率跟不上写入速率会导致磁盘空间用完&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;每个键只存在于索引中的一个位置，在OLTP数据库中有优势，且可以直接把锁连接到树&lt;/td&gt;
+      &lt;td&gt;LSM会在不同的段中保存某个key的多个副本&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;其他索引&quot;&gt;其他索引&lt;/h3&gt;
+
+&lt;p&gt;二级索引，通常对于有效执行连接至关重要。&lt;/p&gt;
+
+&lt;p&gt;可以在堆文件中存储行的元数据，每个索引引用到堆文件的一个位置。实际的数据保存在一个地方。在不更改键的情况下更新值，堆文件十分高效，只要新value不大于旧value，就可以覆盖记录，如果新value大，可能需要移到堆文件中有足够空间的位置，这猴子那个情况下所有索引都要更新指向新位置，或者在旧堆位置留下一个转发指针。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;聚簇索引：在索引里存放行数据&lt;/li&gt;
+  &lt;li&gt;非聚簇索引：仅在索引中存储对数据的引用&lt;/li&gt;
+  &lt;li&gt;包含列的索引/覆盖索引：其存储表的一部分在索引内。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;聚簇索引和覆盖索引可以加快读取速度，但是需要额外的存储空间，增加写入开销，需要额外的事务保证。&lt;/p&gt;
+
+&lt;p&gt;多列索引：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;连接索引（concatenated index） 它通过将一列的值追加到另一列后面，简单地将多个字段组合成一个键（索引定义中指定了字段的连接顺序）。比如按照字典序排序的花名册，可以很快查找相同姓氏的人们，或者名字中前几个字相同的人们，但是无法查询最后一个字相同的人们。&lt;/li&gt;
+  &lt;li&gt;多维索引（multi-dimensional index）B树和LSM树不支持，可以利用空间填充曲线把二维转换成单个数字再用B树或者直接用R树&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;全文搜索和模糊索引（这些应该是信息检索里面的内容，比如编文档分类辑距离什么的）&lt;/p&gt;
+
+&lt;h3 id=&quot;在内存中存储一切&quot;&gt;在内存中存储一切&lt;/h3&gt;
+
+&lt;p&gt;RAM变得便宜，数据集不那么大，且可以分布在多个机器，内存数据库发展起来了。&lt;/p&gt;
+
+&lt;p&gt;某些内存中的键值存储仅用于缓存，可以接受断电丢失数据，有一些需要达成持久性的，可以用电池供电的RAM将更改日志写入磁盘或者将定时快照写入磁盘来实现。&lt;/p&gt;
+
+&lt;p&gt;内存数据库的性能优势并不是因为它们不需要从磁盘读取的事实（即使是基于磁盘的数据库也可能不需要读磁盘，因为操作系统会在内存中进行缓存），更快的真正原因是省去了将内存数据结构编码为磁盘数据结构的开销。&lt;/p&gt;
+
+&lt;p&gt;Redis由于将所有数据保存在内存中，没所以为各种数据结构（优先级队列和集合）提供了类似数据库的接口，实现起来方便。&lt;/p&gt;
+
+&lt;p&gt;内存数据库也可以支持比内存更大的数据集，比如可以用反缓存(anti-caching)方法将最近最少使用的数据从内存移到磁盘，需要访问的时候再重新加载，有点像OS里面的虚拟内存和交换空间吗，但是数据库可以更有效管理内存，因为可以粒度很小，而不一定是面向页面的。&lt;/p&gt;
+
+&lt;h2 id=&quot;事务处理还是分析&quot;&gt;事务处理还是分析？&lt;/h2&gt;
+
+&lt;p&gt;交互式的应用程序的访问模式称为&lt;strong&gt;在线事务处理（OLTP, OnLine Transaction Processin）&lt;/strong&gt;。查询通常由业务分析师编写，并提供给帮助公司管理层做出更好决策（商业智能）的报告。为了区分这种使用数据库的事务处理模式，它被称为&lt;strong&gt;在线分析处理（OLAP, OnLine Analytice Processing）&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;属性&lt;/th&gt;
+      &lt;th&gt;OLTP&lt;/th&gt;
+      &lt;th&gt;OLAP&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;主要读取模式&lt;/td&gt;
+      &lt;td&gt;查询少量记录，按键读取&lt;/td&gt;
+      &lt;td&gt;在大批量记录上聚合&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;主要写入模式&lt;/td&gt;
+      &lt;td&gt;随机访问，写入要求低时延&lt;/td&gt;
+      &lt;td&gt;批量导入，事件流&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;主要用户&lt;/td&gt;
+      &lt;td&gt;终端用户，通过web应用&lt;/td&gt;
+      &lt;td&gt;内部数据分析师，决策支持&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;处理的数据&lt;/td&gt;
+      &lt;td&gt;数据的最新状态（当前时间点）&lt;/td&gt;
+      &lt;td&gt;随时间推移的历史事件&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;数据集尺寸&lt;/td&gt;
+      &lt;td&gt;GB~TB&lt;/td&gt;
+      &lt;td&gt;TB~PB&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;公司在单独的数据库上进行分析，这个单独的数据库称为数据仓库（data warehouse）&lt;/p&gt;
+
+&lt;h3 id=&quot;数据仓库&quot;&gt;数据仓库&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;星型和雪花型分析的模式&quot;&gt;星型和雪花型：分析的模式&lt;/h3&gt;
+
+&lt;p&gt;星型模型：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;模型中心是一个事实表，每一行代表在特定时间发生的时间，然后一些列是属性&lt;/li&gt;
+  &lt;li&gt;事实表中其他列是对其他表（维度表）的外键引用，维度代表了时间发生的who,where,what,when,why,how。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其中比如尺寸可以进一步分为子尺寸，品牌和产品类型可能有单独的表格，dim表中每一行可能又能将某些列作为外键引用，而不是字符串，这个时候就变成了星型模型。&lt;/p&gt;
+
+&lt;h2 id=&quot;列存储&quot;&gt;列存储&lt;/h2&gt;
+
+&lt;p&gt;事实表中的列数很多，经常超过100列，我们分析查询可能只用到部分列，但是访问大量的行需要将行的全部列都加载，解析他们然后过滤掉不符合要求的条件，很慢很不划算。&lt;/p&gt;
+
+&lt;p&gt;列存储的思想很简单，将来自每一列的所有值存储在一起放在单独的文件，查询只需读取和解析查询中使用的那些列。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;面向列的存储还很适合压缩来减少对磁盘吞吐量的需求。&lt;/p&gt;
+
+&lt;p&gt;比如数据仓库中特别有效的一种技术是位图编码。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;比如查询&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;WHERE product_sk IN（30，68，69）
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;只需要加载product_sk=30，68，69三个位图并计算位图按位或&lt;/p&gt;
+
+&lt;p&gt;查询&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;WHERE product_sk = 31 AND store_sk = 3 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;只需加载product_sk = 31 和 store_sk = 3 的位图并按位与即可&lt;/p&gt;
+
+&lt;p&gt;一列中不同值的数量与行数相比较小，加入有n个不同值的列，可以转化成n个独立的位图，每个不同值的一个位图，每行一位，如果该行有该值，则该位为1，否则为0。&lt;/p&gt;
+
+&lt;p&gt;如果n很小，则这些位图可以每行存储一位。如果n很大，位图中有很多零，位图可以另外进行游程编码(Run-length encoding)，可以使列的编码十分紧凑。&lt;/p&gt;
+
+&lt;h3 id=&quot;内存带宽和向量处理&quot;&gt;内存带宽和向量处理&lt;/h3&gt;
+
+&lt;p&gt;对于数据仓库查询来说，巨大的瓶颈是从磁盘获取数据到内存的带宽。还有主存储器到CPU缓存中的带宽，避免CPU指令处理流水线中的分支错误预测和泡沫。&lt;/p&gt;
+
+&lt;p&gt;面向列的存储布局也可以有效利用CPU周期。例如查询引擎可以将大量压缩的列数据存放在CPU的L1缓存中，然后在紧密循环中循环（没有函数调用），这样会快很多，而且位图的模式里面的按位与和按位或可以直接运行，这种技术称为矢量化处理。&lt;/p&gt;
+
+&lt;h3 id=&quot;列存储中的排序顺序&quot;&gt;列存储中的排序顺序&lt;/h3&gt;
+
+&lt;p&gt;每个列单独排序是没有意义的，因为那样就不知道列中的哪些项属于同一行。我们重建一行必须要知道一列中的k行和另一列中的k行属于同一行。&lt;/p&gt;
+
+&lt;p&gt;所以要对一整行进行排序。而且还可以有多个排序关键字，可以加快查询速度，同时排序后列存储中相同的值会连续重复多次，有利于压缩。&lt;/p&gt;
+
+&lt;p&gt;第一个排序键的压缩效果最强，第二个和第三个排序键就混乱了，不会有长时间的重复值。&lt;/p&gt;
+
+&lt;h3 id=&quot;写入列存储&quot;&gt;写入列存储&lt;/h3&gt;
+
+&lt;p&gt;利用B树原地更新对于压缩的列是不可能的，因为想要在排序表中插入一行，就不得不重写所有列文件。&lt;/p&gt;
+
+&lt;p&gt;更好的解决方案：LSM树，内存中Memtable是面向行还是列不重要，积累了足够多的写入数据时，将与磁盘上的列文件进行合并，并批量写入新文件。&lt;/p&gt;
+
+&lt;p&gt;查询需要检查磁盘上的列数据和最近在内存中的写入，并将两者结合。查询优化器隐藏了用户这个区别，从分析师角度看，通过插入更新删除操作进行修改的数据会立即反映在后续的查询中。&lt;/p&gt;
+
+&lt;h2 id=&quot;聚合数据立方体和物化视图&quot;&gt;聚合：数据立方体和物化视图&lt;/h2&gt;
+
+&lt;p&gt;由于数据仓库查询总是执行聚集函数，所以可以缓存最频繁的计数。&lt;/p&gt;
+
+&lt;p&gt;创建这种缓存的一种方式是物化视图，物化视图是查询结果的实际副本，当底层数据发生变化时物化视图需要更新，这样的更新成本很高。&lt;/p&gt;
+
+&lt;p&gt;物化视图的特例称为数据立方体或者OLAP立方，是按照不同维度的聚合网络。
+&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-24-pic11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;上面的例子就是对一个轴和另一轴上的产品都进行求和并且存在total里面。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;优点是查询总和时会很快，因为已经预先计算了，还有比如想知道总销售额不用再扫描数万行了。&lt;/li&gt;
+  &lt;li&gt;缺点是不具有灵活性，所以数据仓库尽可能保留原始数据，并且将聚合数据仅仅用在某些特定查询上。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;小结&quot;&gt;小结&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;OLTP面向用户&lt;/li&gt;
+  &lt;li&gt;OLAP面向数据分析师&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;OLAP方面有两大主流学派的存储引擎&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;log-structure：LSM树什么的，可以实现较高的写入吞吐量&lt;/li&gt;
+  &lt;li&gt;update-in-place: B tree&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Jeremy Yang</name></author><category term="DDIA" /><summary type="html">TOC</summary></entry><entry><title type="html">数据模型与查询语言</title><link href="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html" rel="alternate" type="text/html" title="数据模型与查询语言" /><published>2021-10-17T00:00:00+08:00</published><updated>2021-10-17T00:00:00+08:00</updated><id>http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80</id><content type="html" xml:base="http://localhost:4000/%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B8%8E%E6%9F%A5%E8%AF%A2%E8%AF%AD%E8%A8%80.html">&lt;h2 id=&quot;toc&quot;&gt;TOC&lt;/h2&gt;
 
 &lt;p&gt;对于每层数据模型的关键问题是：&lt;strong&gt;它是如何用低一层数据模型来表示的？&lt;/strong&gt;&lt;/p&gt;
 
@@ -32,7 +712,7 @@
 
 &lt;p&gt;如果用关系型数据模型去表征的话：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/Jeremy0953/Jeremy0953.github.io/main/pics/2021-10-17-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-17-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;用JSON文档去表示：&lt;/p&gt;
 
@@ -366,7 +1046,7 @@ _:namerica :type :&quot;continent&quot;
 
 &lt;p&gt;发布推文时，只需要将新推文推入全局推文集合即可，当请求自己的主页时间线时，首先查找他关注的所有人，查询这些被关注用户发布的推文并按时间顺序合并。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/Jeremy0953/Jeremy0953.github.io/main/pics/2021-10-08-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-08-pic1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;可以利用这样子的sql查询&lt;/p&gt;
 
@@ -381,7 +1061,7 @@ WHERE follows.follower_id = current_user
 
 &lt;p&gt;为每个用户的主页时间线维护一个缓存，当用户发布推文时就将新的推文插入到每一个关注者的缓存中。所以读取主页时间线的请求开销很小，因为已经提前计算好了。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://raw.githubusercontent.com/Jeremy0953/Jeremy0953.github.io/main/pics/2021-10-08-pic2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://jeremy0953.github.io/pics/2021-10-08-pic2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;推特一开始使用方法1，但是系统跟不上查询的负载，所以用了方法2&lt;/p&gt;
 

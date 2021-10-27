@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>数据编码与演化</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.1" />
+<meta property="og:title" content="数据编码与演化" />
+<meta name="author" content="Jeremy Yang" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="数据编码与演化" />
+<meta property="og:description" content="数据编码与演化" />
+<link rel="canonical" href="http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html" />
+<meta property="og:url" content="http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html" />
+<meta property="og:site_name" content="This is Jeremy!" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-27T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="数据编码与演化" />
+<script type="application/ld+json">
+{"headline":"数据编码与演化","dateModified":"2021-10-27T00:00:00+08:00","datePublished":"2021-10-27T00:00:00+08:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html"},"url":"http://localhost:4000/%E6%95%B0%E6%8D%AE%E7%BC%96%E7%A0%81%E4%B8%8E%E6%BC%94%E5%8C%96.html","author":{"@type":"Person","name":"Jeremy Yang"},"description":"数据编码与演化","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="This is Jeremy!" /><link rel="shortcut icon" type="image/x-icon" href="/logo.png" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="auto">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">..</a><article>
+  <p class="post-meta">
+    <time datetime="2021-10-27 00:00:00 +0800">2021-10-27</time>
+  </p>
+  
+  <h1>数据编码与演化</h1>
+
+  <h1 id="数据编码与演化">数据编码与演化</h1>
+
+<h2 id="toc">TOC</h2>
+
+<p>应用程序会随时间发生变化，大多数情况下，更改应用程序功能时也需要更改其存储的数据：可能需要捕获新的字段或者记录类型或者以新的方式呈现已有数据。</p>
+
+<p>对于大型应用系统：</p>
+<ul>
+  <li>对于服务器端，可能要滚动更新（分阶段发布），每次将新版本部署到少量节点，看能否正常运行，然后逐步在所有节点更新新的代码。这样新版本部署无需服务暂停，从而支持更频繁的版本发布和更好的演化。</li>
+  <li>对于客户端，只能寄希望于用户，然而他们在一段时间内可能不会更新新的版本。</li>
+</ul>
+
+<p>这意味着<strong>新旧版本的代码和新旧数据格式，可能会同时在系统内共存</strong>。为了保证兼容性，需要保持双向兼容性：</p>
+<ul>
+  <li>向后兼容——新的代码可以读取旧代码编写的数据</li>
+  <li>向前兼容——较旧代码可以读取新代码编写的数据</li>
+</ul>
+
+<p>向后兼容不难实现，因为新代码的作者清楚旧代码的编写格式，向前兼容比较难，因为需要旧代码忽略新代码所做的添加。</p>
+
+<h2 id="数据编码格式">数据编码格式</h2>
+
+<ol>
+  <li>内存中，数据保存在对象，结构体，数组，哈希表等数据结构中。（也就是说可以用指针引用之类的）</li>
+  <li>将数据写入文件或者向网络中发送时，必须编码为字节序列。（由于指针对于别的进程没有什么意义，所以使用的数据结构就有所不同）</li>
+</ol>
+
+<p><strong>从内存中的表示到字节序列的转化称为编码（或序列化），相反的过程叫做解码（或解析，反序列化）。</strong></p>
+
+<h2 id="语言特定的格式">语言特定的格式</h2>
+
+<p>很多编程语言都内置支持将内存中的对象编码为字节序列比如Java有java.io.Serializable 等。但是他们存在问题：</p>
+<ul>
+  <li>编码格式和语言绑定，用另一种语言访问很难。</li>
+  <li>为了在相同的对象类型中恢复数据，解码过程要能<strong>实例化任意的类</strong>。这可能导致一些安全隐患。</li>
+  <li>这些库没有考虑向前兼容和向后兼容的问题。</li>
+  <li>效率问题（编码解码的时间，还有编码结构的大小）。</li>
+</ul>
+
+<h2 id="json-xml和二进制变体">JSON XML和二进制变体</h2>
+<p>XML经常被批评过于冗长和不必要的复杂。JSON受欢迎主要由于它在Web浏览器中内置支持，以及简单。CSV很流行，尽管功能很弱。</p>
+
+<p>JSON,XML,CSV都是文本格式都有着不错的可读性，但是也有问题：</p>
+<ul>
+  <li>数字编码有模糊之处：XML 和CSV中无法区分数字和由数字构成的字符串，JSON可以区分数字和字符串但是无法区分整数和浮点数。</li>
+  <li>JSON,XML对Unicode字符串有很好的支持但是不支持二进制字符串（没有字符编码的字符序列）
+    - XML和JSON都有可选的模式支持。模式学习和实现比较复杂，而且没有使用这些的应用只能硬编码编码解码的逻辑。
+    <ul>
+      <li>CSV没有任何模式，所以程序需要定义每行没列的含义。如果应用程序添加新的行和列，则需要手动处理更改。</li>
+    </ul>
+
+    <p>尽管这些数据模式存在缺陷，但是他们也很受欢迎，毕竟过，让不同的组织达成一致的难度通常超过了其他所有问题。</p>
+  </li>
+</ul>
+
+<h3 id="二进制编码">二进制编码</h3>
+<p>JSON不像XML那样冗长，但是与二进制格式相比还是占了大量空间。这导致开发了大量的二进制编码用以支持JSON（比如MessagePack和BISON）</p>
+
+<p>其中一些格式还扩展了数据类型集，但其他格式保持了JSON/XML数据模型不变。特别是他们没有规定模式（schema）所以需要在编码数据时包含所有的对象字段名称。</p>
+
+<p>一条样本记录</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+	    “username”:”Martin”,
+		    “favoriteNumber”:1337,
+			    “interests”:[“daydreaming”,”hacking”]
+}
+</code></pre></div></div>
+
+<p>看一个MessagePack的例子。
+  <img src="https://jeremy0953.github.io/pics/2021-10-27-pic1.png" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- 0x83——表示接下来是包含三个字段（第四位0x03）的对象（高四位0x80）
+ - 0xa8——便是接下来是八个字节长度的字符串（高四位0xa0，第四位0x08）
+  - 后面是八字节的ASCII的userName
+   - 以此类推
+</code></pre></div></div>
+
+<h2 id="thrift与protocol-buffers">Thrift与Protocol Buffers</h2>
+
+<p>Apache Thrift和Protocol Buffers是基于相同原理的两种二进制编码库。他们都需要模式来编码任意的数据。</p>
+
+<p>Thrift模式定义</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Person {
+	   1: required string  userName,
+	      2: optional i64  favoriteNumber,
+		     3: optional list&lt;string&gt; interests
+}
+</code></pre></div></div>
+
+<p>Protocol Buffers等价模式定义</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>message Person {
+	  required string user_name  = 1;
+	    optional int64 favorite_number  = 2;
+		  repeated string interests  = 3;
+}
+</code></pre></div></div>
+
+<p>Thrift有两种不同的二进制编码格式，分别称为BinaryProtocol和CompactProtocol。
+下图是BinaryProtocol。</p>
+
+<p><img src="https://jeremy0953.github.io/pics/2021-10-27-pic2.png" alt="" /></p>
+
+<p>与MessagePack相比最大的区别是字段名用字段标签（1，2，3）这些是模式定义中出现的数字，是字段名称的别名，用来指示当前字段。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CompactProtocol语义上等同于BinaryProtocol。他将字段类型和标签号打包到单字节中，并使用可变长度整数来实现。对于数字1337，不使用全部8字节而是使用两个字节。每个字节的最高位用来指示是否还有更多的字节。
+
+  ![](https://jeremy0953.github.io/pics/2021-10-27-pic3.png)
+
+  最后还有Protocol Buffers
+   ![](https://jeremy0953.github.io/pics/2021-10-27-pic4.png)
+
+   最后有一个小细节，模式中每一个字段被标记为了required和optional，但是这段字段如何编码没有任何影响，如果字段设置了required但是字段没有填充，运行时检查将会出现失败。
+</code></pre></div></div>
+
+<h3 id="字段标签和模式演化">字段标签和模式演化</h3>
+
+<p>模式不可避免地需要随着时间而不断变化，称之为模式演化。那么这两种是如何在向前兼容和向后兼容的同时应对模式更改呢？</p>
+
+<p>一条编码记录指示一组编码字段的拼接，每个字段由其标签号标识并使用数据类型进行注释。如果没有设置字段值则将其从编码的记录中简单地忽略。由此可以看出字段标签（field tag）对于编码数据的含义至关重要。可以轻松更改模式中字段的名称，编码永远不直接引用字段名称，但是不能随便更改字段的标签，否则会导致所有现有编码数据无效。</p>
+
+<p>添加字段时：</p>
+<ul>
+  <li>向前兼容：如果旧代码读新代码写入的数据，如果有他不能识别的标记号码直接忽略就好。</li>
+  <li>向后兼容：每个字段有唯一的标记号码，所以新的代码总是能知道旧数据的标记号码，唯一的细节是如果添加一个新的字段则不能使其成为必需字段（required）因为旧代码不会添加新字段，为了保证向后兼容，在模式的初始部署之后添加的每个字段都必须是可选的或者是有默认值的。</li>
+</ul>
+
+<p>删除字段就像添加字段一样，不过向前兼容和向后兼容正好相反。这意味着只能删除可选的字段（必填字段永远不能被删除）而且不能输再次使用相同的标签号码（因为可能有写入的数据包含旧的标签号码，该字段必需被新代码忽略）</p>
+
+<h3 id="数据类型和模式演化">数据类型和模式演化</h3>
+
+<p>如何改变字段的数据类型呢？这是有可能的，但是存在值会丢失或者被截断的风险。</p>
+
+<h2 id="avro">Avro</h2>
+
+<p>Avro是另一种二进制编码格式，也适用模式来指定编码，有两种模式语言，一种(Avro IDL)用于人工编辑，另一种（基于JSON）更易于机器读取。</p>
+
+<p>用Avro IDL编写的事例模式如下所示：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>record Person {
+	  string  username;
+	    union {null, long}  favoriteNumber = null;
+		  array&lt;string&gt; interests;
+}
+</code></pre></div></div>
+<p>该模式的等价JSON表示如下：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+	  “type”: “record”,
+	    “name”: “Person”,
+		  “field”: [
+		      {“name”: “userName”,  “type”: “string”},
+			      {“name”: “favoriteNumber”, “type”:[“null”, “long”], “default”: null},
+				      {“name”: “interests”, “type”: {“type”: “array”, “items”: “string”}} 
+					    ]
+}
+</code></pre></div></div>
+<p>首先，注意模式中<strong>没有标签编号</strong>。如果用这个编码模式表示事例记录，只有32字节，这是所见到的所有编码中最紧凑的。编码字节序列分解如图所示：</p>
+
+<p><img src="https://jeremy0953.github.io/pics/2021-10-27-pic5.png" alt="" /></p>
+
+<p>如图所示，可以看到没有什么标识字段或者数据类型。编码只是由连在一起的一些列值组成。一个字符串只是一个长度前缀后面跟着UTF-8字节流，但是编码数据里面没有告诉你它是一个字符流。它也可以是一个整数，或者其他什么类型，整数使用可变长度编码（与CompactProtocol相同）进行编码。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> 为了解析，按照他们出现在模式中的顺序遍历这些字段，然后直接采用模式告诉你每个字段的数据类型，意味着读取数据代码使用的模式必需和写入数据使用的模式完全相同。如果不匹配就无法解析。
+  
+   *那么Avro如何支持编码演化？*
+</code></pre></div></div>
+
+<h3 id="写模式与读模式">写模式与读模式</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	- 写模式：编码应用程序所用的模式（例如可以编译到应用程序中的模式）
+	- 读模式：应用程序解码，期望数据所希望的模式（应用程序依赖的模式，应用程序代码都有可能是根据读模式动态生成的）
+
+	Avro的关键思想，**写模式和读模式不一定是完全一模一样**，只需要保持兼容即可，Avro库会自动对比查看写模式和读模式并将数据从写模式转换为读模式来解决差异。
+
+	 例如，如果读写模式的字段顺序不同也没关系，如果读取的代码遇到写模式里有但是读模式没有的就忽略它，如果读模式遇到了需要读但是写模式里面没有的就直接使用默认值。
+</code></pre></div></div>
+
+<h3 id="模式演化规则">模式演化规则</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	   - 向前兼容： 新版本的writer，旧版本的reader
+	   - 向后兼容： 旧版本的writer，新版本的reader
+
+	   为了保持兼容性，只能添加和删除有**默认值**的字段。
+
+	   比如读模式里面加了一个字段，但是旧的写模式里面没有，读取的时候就直接使用默认值。
+
+	   更改模式字段名称和向联合类型添加分支都是向后兼容的，但是不能向前兼容。
+</code></pre></div></div>
+
+<h3 id="writer模式是什么">writer模式是什么？</h3>
+
+<p><em>reader如何知道特定的数据采用哪个writer的模式编码的？</em></p>
+
+<p>在每个记录中都包含整个模式不现实因为有时模式甚至比编码数据还要大很多。答案取决于Avro的上下文。例如：</p>
+<ul>
+  <li>有很多记录的大文件：所有的记录都用相同的模式进行编码，这种情况下该文件的writer可以仅在文件的开头包含writer的模式信息。</li>
+  <li>具有单独写入记录的数据库：不同的记录可能会在不同的时间点使用不同的writer进行编写，最简单的方法是在每个编码记录的开始处包含一个写模式的版本号，并在数据库里面保留一个模式版本列表。reader可以获取记录，提取版本号，并且从数据库中查询版本号对应的writer模式，使用该writer模式解码记录的其余部分。</li>
+  <li>使用网络连接发送记录：建立通信时协商模式版本，然后在连接的生命周期中使用该模式。这也是Avro RPC协议的基本原理。</li>
+</ul>
+
+<p>在任何情况下，提供一个模式版本信息的数据库都很有用，可以充当一个说明文档来检查系统的兼容性。</p>
+
+<h3 id="动态生成的模式">动态生成的模式</h3>
+
+<p><strong>Avro的一个优点是不包含任何标签号。</strong></p>
+
+<p>比如一个关系数据库想要把它的内容转储到一个文件中，并且要用二进制格式，可以使用Avro，然后如果数据库模式发生变化（比如加了一列），就可以生成新的Avro模式，用新的模式导出数据即可，每次运行时都可以简单的进行模式转换，由于字段是通过名字来标识的，所以新writer和旧的reader可以匹配。</p>
+
+<p>相比之下Thrift或者Protocol Buffers需要手动分配字段标签，每次数据库模式更改时都需要手动更新数据库列名到字段标签的映射（虽然可能可以自动化，但是生成器必需十分小心，不能分配以前使用的字段标签）这种动态生成的模式是Avro的目标。</p>
+
+<h3 id="代码生成和动态类型语言">代码生成和动态类型语言</h3>
+
+<p>Thrift和Protocol Buffers依赖于代码生成，定了模式之后，可以使用静态类型编程语言生成此模式的代码。动态类型编程语言生成代码没太大意义，因为他们避免了明确的编译过程。对于动态生成的模式（比如Avro），代码生成反而是一个障碍。</p>
+
+<p>Avro为静态类型编程语言提供了可选的代码生成，而且也可以在不生成代码的情况下直接使用。如果有对象容器文件，可以简单地使用Avro库打开它，并用和查看JSON文件一样查看数据。（该文件里面嵌入了writer模式，他是自描述的）</p>
+
+<h3 id="模式的优点">模式的优点</h3>
+
+<p>尽管JSON、XML和CSV文本数据格式非常普遍，基于模式的二进制编码也有很多不错的属性：</p>
+<ul>
+  <li>他们比很多“二进制JSON”变体更紧凑，可以忽略字段名称</li>
+  <li>模式是一种有价值的文档</li>
+  <li>模式数据库允许在部署任何内容之前检查模式更改的向前和向后兼容性</li>
+  <li>对于静态类型编程语言用户来说，从模式生成代码的能力是有限的，它能够在编译时自动检查</li>
+</ul>
+
+<h2 id="数据流模式">数据流模式</h2>
+
+<p><em>数据可以通过多种方式从一个进程流向另一个进程。谁编码数据？谁解码数据？</em></p>
+
+<h3 id="基于数据库的数据流">基于数据库的数据流</h3>
+
+<p>数据库中的值可能由较新版本的代码写入，然后由仍运行的旧版本代码读取（因为滚动升级中某些实例已经更新，某些实例没有更新）</p>
+
+<p>数据库当然要支持向后兼容（不然无法读取之前的值了）</p>
+
+<p><strong>注意</strong>：比如记录模式中增加了一个字段，然后用旧的模式去读，更新记录并且写回，理想的行为是旧代码保持新字段不变即使无法解释。</p>
+
+<p>但是有时比如解释成应用程序中的对象，然后重新编码就有可能丢失未知字段，解决这个问题不难但是要有这个意识。</p>
+
+<h4 id="不同时间写入不同的值">不同时间写入不同的值</h4>
+
+<p>服务端的应用程序可能会在几分钟内用新版本完全替代旧版本，但是数据库不会这样，五年前的数据仍然采用原始编码，除非已经明确重写了他，这种现象有时被称为<strong>数据比代码更长久</strong></p>
+
+<p>将数据重写（迁移）到新模式是可能的，但是代价太大了。</p>
+
+<p>很多数据库尽可能避免这种操作，关系型数据库允许进行简单的模式更改，例如添加如有默认值为空的新列，而不重写所有数据。读取旧行时数据库会为磁盘上数据缺失的所有列填充为空值。</p>
+
+<p>因此演化支持整个数据库看起来像是采用单个模式编码，即使底层存储可能包含各个版本模式所编码的记录。</p>
+
+<h4 id="归档存储">归档存储</h4>
+
+<p>当为数据库备份或者加载到数据仓库时，数据转储通常使用最新的模式进行编码，由于无论何时都要复制数据，所以此时最好对数据副本进行统一的编码。</p>
+
+<p>由于数据转储是一次性写入的，而且以后不会变，因此像Avro对象容器文件这样的格式非常适合。也可以使用列存储。</p>
+
+<h3 id="基于服务的数据流rest和rpc">基于服务的数据流：REST和RPC</h3>
+
+<p>网络通信的进程有多种通信方式，最常见的有客户端和服务器。服务器通过网络公开API，客户端可以连接到服务器以向该API发出请求。服务器公开的API称为服务。</p>
+
+<p>客户端可以向服务器发出网络请求，此外，服务器本身可以是另一项服务的客户端（比如web应用服务器作为数据库的客户端）这种方法通常用于将大型应用程序按照功能区域分解为较小的服务，当一个服务需要另一个服务的某些功能或者数据时，就会向另一个服务发出请求。这种构建应用的方式叫做面向服务的体系结构（ service-oriented-architecture, SOA)，最近更名为微服务体系结构(microservices architecture)</p>
+
+<p>服务类似于数据库，但是服务公开了特定应用程序的API，他只允许由服务的业务逻辑预定的输入和输出。服务可以对客户端可以做什么不可以做什么施加细粒度的限制。</p>
+
+<p>微服务的设计目标：通过使服务可以独立部署和演化，让应用程序更加易于更改和维护。</p>
+
+<p>网络服务：</p>
+<ul>
+  <li>运行在客户端的应用程序通过HTTP请求服务。</li>
+  <li>一种服务向同一个组织的另一个服务提出请求（这类软件有时叫做中间件）。</li>
+  <li>一种服务向不同组织的服务提出请求。</li>
+</ul>
+
+<p>REST：是一个基于HHTP原则的设计理念，它强调简单的数据格式，使用URL来标识资源，并使用HTTP功能进行缓存控制，身份验证和内容类型协商。</p>
+
+<p>根据REST原则设计的API称为RESTful</p>
+
+<p>远程过程调用（RPC)的问题</p>
+<ul>
+  <li>本地调用是可预测的，并且成功和失败只取决于参数。网络请求无法预测，请求或响应可能因为网络问题而丢失，或者因为远程计算机可能速度慢或者不可用。</li>
+  <li>本地函数调用要么返回结果要么抛出一个异常，或者永远不会返回，但是网络请求有可能因为超时返回时可能没有结果，不知道请求是否成功。</li>
+  <li>如果重试失败的请求，有可能请求已经完成，只是响应丢失而已，重试的话导致操作被执行多次。</li>
+  <li>每次本地调用所用时间大致相同，远程调用的时间会慢很多，而且也会有很大变化。</li>
+  <li>调用本地函数时可以传指针（高效），但是远程调用只能编码成网络传输的字节序列，当对象比较大时可能会出现问题。</li>
+  <li>客户端可能有不同语言，所以RPC框架必需可以将数据类型从一个语言转化成另一个语言，最终可能会比较丑陋。</li>
+</ul>
+
+<h3 id="基于消息传递的数据流">基于消息传递的数据流</h3>
+
+<p>异步消息传递系统。</p>
+
+<p>和RPC相比，消息代理（称为消息队列，或面向消息的中间件）的优点：</p>
+<ul>
+  <li>如果接收方不可用或过载，可以充当缓存区，从而提高系统的可靠性。</li>
+  <li>可以自动将消息重新发送到崩溃的进程，从而防止消息丢失。</li>
+  <li>避免了发送方需要知道接收方的IP地址和端口号（这在虚拟机和经常启停的云部署中特别有用）</li>
+  <li>它支持将一条消息发送给多个接收方。</li>
+  <li>它在逻辑上将发送方和接收方分离（发送方只是发布消息，并不关心谁使用他们）</li>
+</ul>
+
+<p>然而和RPC相比，消息队列通常是单向的。发送方通常不期望响应，哪怕有响应也是在一个独立的通道完成。这种通信模式是异步的，只是发送然后忘记它。</p>
+
+<p>消息代理的使用方式如下：一个进程向指定的队列或者主题发布消息，代理保证消息被传递给队列或主题的一个或多个消费者或订阅者，在同一个主题上可以有多个生产者和消费者。</p>
+
+<p>主题只提供单向数据流，但是消费者本身可能会将消息发布到另一个主题，也可以发送到一个回复队列，该队列由初始消息发送者来消费。</p>
+
+<h4 id="actor框架">Actor框架</h4>
+
+<p>Actor模型是用于单个进程中并发的编程模型。逻辑被封装在Actor中，而不是直接处理线程（以及竞争条件，锁定和死锁的相关问题）每个Actor通常代表一个客户端或者实体，可能具有某些本地状态，通过发送和接收异步消息与其他Actor通信。不保证消息传送，在某些情况下，消息会丢失。由于每个Actor一次只处理一个消息，因此不用担心线程，每个Actor都可以由框架独立调度。</p>
+
+<p>分布式Actor框架，这个模型被用来跨越多个节点扩展应用程序。</p>
+
+</article>
+      </div>
+    </main>
+  </body>
+</html>
